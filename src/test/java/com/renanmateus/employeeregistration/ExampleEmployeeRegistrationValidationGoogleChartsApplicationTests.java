@@ -1,0 +1,13 @@
+package com.renanmateus.employeeregistration;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class ExampleEmployeeRegistrationValidationGoogleChartsApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}

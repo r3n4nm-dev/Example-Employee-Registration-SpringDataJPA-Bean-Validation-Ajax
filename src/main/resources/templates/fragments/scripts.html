@@ -1,0 +1,168 @@
+
+<!-- Bootstrap core JavaScript-->
+<script src="/vendor/jquery/jquery.min.js"></script>
+<script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+<!-- Core plugin JavaScript-->
+<script src="/vendor/jquery-easing/jquery.easing.min.js"></script>
+
+<!-- Custom scripts for all pages-->
+<script src="/js/sb-admin-2.min.js"></script>
+
+<!-- Page level plugins -->
+<script src="/vendor/datatables/jquery.dataTables.min.js"></script>
+<script src="/vendor/datatables/dataTables.bootstrap4.min.js"></script>
+
+<!-- Page level custom scripts -->
+<script src="/js/demo/datatables-demo.js"></script>
+<!-- Page level plugins -->
+<script src="/vendor/chart.js/Chart.min.js"></script>
+<script>
+	
+</script>
+<!-- Page level custom scripts -->
+<script>
+
+var ctx = document.getElementById("myPieChart");
+var myPieChart = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Administrador', 'Supervisor', 'Funcionario'],
+    datasets: [{
+      data: [ [[${lista[0]}]], [[${lista[1]}]], [[${lista[2]}]] ],
+      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
+      hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
+      hoverBorderColor: "rgba(234, 236, 244, 1)",
+    }],
+  },
+  options: {
+    maintainAspectRatio: false,
+    tooltips: {
+      backgroundColor: "rgb(255,255,255)",
+      bodyFontColor: "#858796",
+      borderColor: '#dddfeb',
+      borderWidth: 1,
+      xPadding: 15,
+      yPadding: 15,
+      displayColors: false,
+      caretPadding: 10,
+    },
+    legend: {
+      display: false
+    },
+    cutoutPercentage: 80,
+  },
+});
+
+</script>
+
+<!-- DATATABLES -->
+<script>
+$(document).ready(function(){
+	 var table = $("#datatable-funcionarios").DataTable({
+		processing: true,
+		serverSide: true,
+		lengthMenu: [ 5, 10, 15, 20 ],
+		ajax: {
+			url: "/funcionarios/lista", 
+			data: "data"
+		},
+	columns: [
+		{data: 'funcionarioid'},
+		{data: 'nomeCompleto'},
+		{data: 'cpf'},
+		{data: 'funcao.nomeFuncao'},
+		{data: null,
+                'defaultContent': '<button id="buttonEditModal" class="btn btn-warning btn-sm" title="Editar funcionario">Edit</button> <button id="buttonDeleteModal" class="btn btn-danger btn-sm" title="Excluir funcionario">Del</button>'
+        }
+	]
+	});
+	$('#datatable-funcionarios tbody').on('click', '#buttonEditModal', function () {
+		  var row = $(this).closest('tr');
+		  var dataFuncionario = table.row( row ).data();
+		  
+		  $.ajax({
+				method: "GET",
+				url: "/editar/" + dataFuncionario.funcionarioid,
+				beforeSend: function() {
+					$('#editModal').modal();
+					},
+				success: function() {
+					 console.log(dataFuncionario);
+					//Recupera dados
+					$('#editModal #edt_funcionarioid').val(dataFuncionario.funcionarioid);
+					$('#editModal #edt_nomeCompleto').val(dataFuncionario.nomeCompleto);
+					$('#editModal #edt_cpf').val(dataFuncionario.cpf);
+					//important
+					$('#editModal #edt_funcao').val(dataFuncionario.funcao.funcaoid);
+					},
+					error: function() {
+						alert("Ops... algum erro ocorreu, tente novamente.");
+					}
+		  });
+});	
+
+	$("#btn-edit-modal").on("click", function() {
+		var funcionarioDTO = {};
+		funcionarioDTO.funcionarioid = $("#edt_funcionarioid").val();
+		funcionarioDTO.nomeCompleto = $("#edt_nomeCompleto").val();
+		funcionarioDTO.cpf = $("#edt_cpf").val();
+		funcionarioDTO.funcao = $("#edt_funcao").val();
+		$.ajax({
+			method: "POST",
+			url: "/atualizar",
+			data: funcionarioDTO,
+			beforeSend: function() {
+				// removendo as mensagens
+				$("span").closest('.error-span').remove();				
+				//remover as bordas vermelhas
+				$(".is-invalid").removeClass("is-invalid");
+			},
+			success: function() {
+				$("#reload-card-body").load(" #reload-card-body");
+				$("#editModal").modal("hide");
+				//table.ajax.reload();
+				location.reload();
+			},
+			statusCode: {
+				422: function(xhr) {
+						console.log('status error:422', xhr.status);
+					var errors = $.parseJSON(xhr.responseText);
+					console.log(errors);
+					$.each(errors, function(key, val){
+						$("#edt_" + key).addClass("is-invalid");
+						$("#error-" + key)
+							.addClass("invalid-feedback")
+							.append("<span class='error-span'>" + val + "</span>")
+					});
+			}
+			}
+		});
+	});
+	
+	$('#datatable-funcionarios tbody').on('click', '#buttonDeleteModal', function() {
+			
+			var row = $(this).closest('tr');
+		  	idFunc = table.row( row ).data().funcionarioid;
+		  
+		  $('#deleteModal').modal();
+		
+		});
+		
+	$("#btn-delete-modal").on("click", function() {
+		var id = idFunc;
+		$.ajax({
+			method: "GET",
+			url: "/excluir/" + id,
+			success: function() {
+				$("#deleteModal").modal('hide');
+				location.reload();
+				//table.ajax.reload();
+			},
+			error: function() {
+				alert("Ops... Ocorreu um erro, tente mais tarde.");
+			}	
+		});
+	});	
+});
+</script>

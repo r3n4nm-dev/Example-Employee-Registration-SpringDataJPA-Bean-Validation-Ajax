@@ -1,0 +1,49 @@
+<meta charset="UTF-8">
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+	<h1 class="h3 mb-0 text-gray-800">Cadastro de funcionários</h1>
+</div>
+<!-- Content Row -->
+<form th:action="@{/salvar}" th:object="${funcionario}" th:method="POST">
+	<div class="row">
+		<input type="hidden" th:field="*{funcionarioid}" />
+		<!-- Earnings (Monthly) Card Example -->
+		<div class="col-xl-3 col-md-6 mb-4">
+			<label for="recipient-name" class="col-form-label"> Nome do
+				funcionário:</label> <input th:field="*{nomeCompleto}"
+				th:classappend="${#fields.hasErrors('nomeCompleto')} ? is-invalid"
+				type="text" class="form-control">
+			<div class="invalid-feedback" th:errors="*{nomeCompleto}"></div>
+		</div>
+		<div class="col-xl-3 col-md-6 mb-4">
+			<label for="recipient-name" class="col-form-label"> CPF:</label> <input
+				th:field="*{cpf}"
+				th:classappend="${#fields.hasErrors('cpf')} ? is-invalid"
+				type="text" class="form-control">
+			<div class="invalid-feedback" th:errors="*{cpf}"></div>
+		</div>
+
+
+		<div class="col-xl-3 col-md-6 mb-4">
+			<label for="recipient-name" class="col-form-label"> Função:</label>
+			 <select id="funcao" class="form-control" th:field="*{funcao}"
+				th:classappend="${#fields.hasErrors('funcao')} ? is-invalid">
+				<option value="">Selecione</option>
+							<option th:each="f : ${funcao}" th:text="${f.nomeFuncao}"
+								th:value="${f.funcaoid}">...</option>
+
+			</select>
+			<div class="invalid-feedback" th:errors="*{funcao}"></div>
+
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xl-3 col-md-6 mb-4">
+			<input type="submit" class="btn btn-primary" value="Salvar" />
+		</div>
+	</div>
+</form>
+  <script>
+var Selecione = '';
+document.getElementById('funcao').value = Selecione;
+</script>
+
