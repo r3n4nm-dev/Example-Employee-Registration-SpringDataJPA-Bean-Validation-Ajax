@@ -44,7 +44,6 @@ public class FuncionarioController {
 	@RequestMapping(value = { "/index", "/" }, method = RequestMethod.GET)
 	private String index(Funcionario funcionario, Model model) {
 
-		funcionarioRepository.countByFuncao(funcionarioRepository.findAll().get(2).getFuncao());
 		long quantidadeAdm = funcionarioRepository.countByFuncao(funcaoRepository.findByNomeFuncao("Administrador"));
 		long quantidadeSup = funcionarioRepository.countByFuncao(funcaoRepository.findByNomeFuncao("Supervisor"));
 		long quantidadeFunc = funcionarioRepository.countByFuncao(funcaoRepository.findByNomeFuncao("Funcionario"));
